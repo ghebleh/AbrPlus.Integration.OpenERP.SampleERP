@@ -26,6 +26,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Noyan.Repository\Noyan.Repository.csproj" />
     <ProjectReference Include="..\OpenERP.SampleERP.Repository\OpenERP.SampleERP.Repository.csproj" />
     <ProjectReference Include="..\OpenERP.SampleERP.Service\OpenERP.SampleERP.Service.csproj" />
   </ItemGroup>

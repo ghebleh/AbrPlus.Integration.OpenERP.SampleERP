@@ -12,6 +12,7 @@ using AbrPlus.Integration.OpenERP.SampleERP.Api.DI;
 using AbrPlus.Integration.OpenERP.Hosting.DI;
 using AbrPlus.Integration.OpenERP.Hosting.Hosting;
 using AbrPlus.Integration.OpenERP.DI;
+using SeptaKit.Repository;
 
 namespace AbrPlus.Integration.OpenERP.SampleERP.Api
 {
@@ -29,6 +30,7 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Api
             services.GeneralConfigure(Configuration);
 
             services.Configure<SampleErpOption>(x => Configuration.GetSection("App").Bind(x));
+            services.Configure<ConnectionStringOption>(x => Configuration.GetSection("ConnectionStringOption").Bind(x));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
