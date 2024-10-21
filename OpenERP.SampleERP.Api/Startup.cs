@@ -13,6 +13,8 @@ using AbrPlus.Integration.OpenERP.Hosting.DI;
 using AbrPlus.Integration.OpenERP.Hosting.Hosting;
 using AbrPlus.Integration.OpenERP.DI;
 using SeptaKit.Repository;
+using Noyan.Repository2;
+using Noyan.Repository2.Models;
 
 namespace AbrPlus.Integration.OpenERP.SampleERP.Api
 {
@@ -31,6 +33,9 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Api
 
             services.Configure<SampleErpOption>(x => Configuration.GetSection("App").Bind(x));
             services.Configure<ConnectionStringOption>(x => Configuration.GetSection("ConnectionStringOption").Bind(x));
+
+            services.AddDbContext<NoyanDbContext>();
+            services.AddScoped<ITrackingRepository<Sefactor>, TrackingRepository<Sefactor>>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

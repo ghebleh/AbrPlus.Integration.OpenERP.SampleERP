@@ -1,76 +1,44 @@
 ﻿using AbrPlus.Integration.OpenERP.Api.DataContracts;
-using AbrPlus.Integration.OpenERP.SampleERP.Repository;
-using AbrPlus.Integration.OpenERP.Enums;
-using AbrPlus.Integration.OpenERP.Helpers;
 using Microsoft.Extensions.Logging;
-using SeptaKit.Persian;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+using Noyan.Repository2.Models;
+using Noyan.Repository2;
+using AbrPlus.Integration.OpenERP.SampleERP.Service.Helpers;
 
 namespace AbrPlus.Integration.OpenERP.SampleERP.Service
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ICustomerRepository _customerRepository;
-        private readonly ISampleErpCompanyService _sampleErpCompanyService;
+        private readonly ITrackingRepository<Vwsehesab> _trackingRepository;
+        private readonly NoyanDbContext _context;
         private readonly ILogger<CustomerService> _logger;
 
-        public CustomerService(ICustomerRepository customerRepository,
-                               ISampleErpCompanyService sampleErpCompanyService,
+        public CustomerService(ITrackingRepository<Vwsehesab> trackingRepository,
+                               NoyanDbContext context,
                                ILogger<CustomerService> logger)
         {
-            _customerRepository = customerRepository;
-            _sampleErpCompanyService = sampleErpCompanyService;
+            _trackingRepository = trackingRepository;
+            _context = context;
             _logger = logger;
         }
         public IdentityBundle GetBundle(string key)
         {
-            try
-            {
-                var setting = _sampleErpCompanyService.GetCompanyConfig();
-
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetBundle");
-                throw;
-            }
+            throw new NotImplementedException();
         }
         public IdentityBundle GetBundleByCode(string key)
         {
-            try
-            {
-                var setting = _sampleErpCompanyService.GetCompanyConfig();
-
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetBundleByCode");
-                throw;
-            }
+            throw new NotImplementedException();
         }
         public ChangeInfo GetChanges(string lastTrackedVersionStamp)
         {
-            var config = _sampleErpCompanyService.GetCompanyConfig();
+            //get changes from table
+            var localChanges = _trackingRepository.GetTrackingChanges(long.Parse(lastTrackedVersionStamp));
 
-            long currentTrackingVersion = _customerRepository.GetCurrentTrackingVersion();
+            //cross check changes with view
+            //_context.Vwsewsgetinvoices.Where(invoice => localChanges.Select(c => c.IdClt).ToList().Contains(invoice.)
 
-            if (long.TryParse(lastTrackedVersionStamp, out var lastTrackedVersion) &&
-                currentTrackingVersion == lastTrackedVersion)
-            {
-                return new ChangeInfo() { LastTrackedVersion = lastTrackedVersionStamp };
-            }
-
-            var toReturn = new ChangeInfo() { LastTrackedVersion = currentTrackingVersion.ToString() };
-
-            //ToDo : add changes to toReturn.Changes
-
-
-            return toReturn;
+            return ChangeInfoHelpers.ConvertChangesToChangeInfo(localChanges);
         }
         public bool Save(IdentityBundle item)
         {
@@ -83,28 +51,20 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Service
         public void SetTrackingStatus(bool enabled)
         {
             if (enabled)
-            {
-                _customerRepository.EnableTableTracking();
-            }
+                _trackingRepository.EnableTableTracking();
             else
-            {
-                _customerRepository.DisableTableTracking();
-            }
+                _trackingRepository.DisableTableTracking();
         }
         public string[] GetAllIds()
         {
-            var config = _sampleErpCompanyService.GetCompanyConfig();
-
             throw new NotImplementedException();
         }
         public decimal GetCustomerBalance(string customerCode)
         {
-            var config = _sampleErpCompanyService.GetCompanyConfig();
             throw new NotImplementedException();
         }
         public List<IdentityBalance> GetAllIdentityBalance(IdentityBalanceParams identityBalanceParams)
         {
-            var config = _sampleErpCompanyService.GetCompanyConfig();
             throw new NotImplementedException();
         }
     }

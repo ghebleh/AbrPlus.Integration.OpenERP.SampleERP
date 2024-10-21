@@ -2,10 +2,10 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using Noyan.Repository.Models;
-namespace Noyan.Repository;
+using Noyan.Repository2.Models;
+namespace Noyan.Repository2;
 
-public class TrackingRepository<TEntity> : ITrackingRepository
+public class TrackingRepository<TEntity> : ITrackingRepository<TEntity>
 {
     private DbContext _context;
 
@@ -13,6 +13,12 @@ public class TrackingRepository<TEntity> : ITrackingRepository
     {
         _context = context;
     }
+
+    public void DisableTableTracking()
+    {
+        throw new NotImplementedException();
+    }
+
     public void EnableTableTracking()
     {
         string initialCatalog = _context.Database.GetDbConnection().Database;
@@ -31,14 +37,14 @@ public class TrackingRepository<TEntity> : ITrackingRepository
                 string query2 = $"ALTER DATABASE {initialCatalog} SET CHANGE_TRACKING = ON (CHANGE_RETENTION = 5 DAYS, AUTO_CLEANUP = ON)";
                 _context.Database.ExecuteSqlRaw(query2);
             }
-            catch (Exception exception)
+            catch
             {
                 throw;
             }
         }
 
         string query3 = $"SELECT Count(*) AS [Value] FROM sys.change_tracking_tables WHERE object_id = OBJECT_ID('{arg}')";
-        var isTableEnabled = (_context.Database.SqlQueryRaw<int>(query3).First()) > 0;
+        var isTableEnabled = _context.Database.SqlQueryRaw<int>(query3).First() > 0;
         if (!isTableEnabled)
         {
             try
@@ -46,7 +52,7 @@ public class TrackingRepository<TEntity> : ITrackingRepository
                 string query4 = $"ALTER TABLE {arg} ENABLE CHANGE_TRACKING WITH(TRACK_COLUMNS_UPDATED = OFF)";
                 _context.Database.ExecuteSqlRaw(query4);
             }
-            catch (Exception exception2)
+            catch
             {
                 throw;
             }
@@ -111,13 +117,13 @@ public class TrackingRepository<TEntity> : ITrackingRepository
         {
             while (oReader.Read())
             {
-                var t1 = oReader["SYS_CHANGE_VERSION"].ToString() ?? "";
+                var t1 = oReader["SYS_CHANGE_VERSION"].ToString() ?? "-1";
                 var t2 = oReader["SYS_CHANGE_CREATION_VERSION"].ToString() ?? "";
                 var t3 = oReader["SYS_CHANGE_OPERATION"].ToString() ?? "";
                 var t4 = oReader["SYS_CHANGE_COLUMNS"].ToString() ?? "";
                 var t5 = oReader["SYS_CHANGE_CONTEXT"].ToString() ?? "";
-                var t6 = oReader["id_clt"].ToString() ?? "";
-                result.Add((t1, t2, t3, t4, t5, t6));
+                var t6 = oReader[5].ToString() ?? "";
+                result.Add((long.Parse(t1), t2, t3, t4, t5, t6));
 
             }
         }
@@ -149,14 +155,14 @@ public class TrackingRepository<TEntity> : ITrackingRepository
     */
 }
 
-public record struct ChangeTrackingRecord(string ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt)
+public record struct ChangeTrackingRecord(long ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt)
 {
-    public static implicit operator (string ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt)(ChangeTrackingRecord value)
+    public static implicit operator (long ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt)(ChangeTrackingRecord value)
     {
         return (value.ChangeVersion, value.ChangeCreationVersion, value.ChangeOperation, value.ChangeColumns, value.ChangeContext, value.IdClt);
     }
 
-    public static implicit operator ChangeTrackingRecord((string ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt) value)
+    public static implicit operator ChangeTrackingRecord((long ChangeVersion, string ChangeCreationVersion, string ChangeOperation, string ChangeColumns, string ChangeContext, string IdClt) value)
     {
         return new ChangeTrackingRecord(value.ChangeVersion, value.ChangeCreationVersion, value.ChangeOperation, value.ChangeColumns, value.ChangeContext, value.IdClt);
     }

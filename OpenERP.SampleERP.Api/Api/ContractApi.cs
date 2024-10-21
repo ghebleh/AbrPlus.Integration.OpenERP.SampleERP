@@ -11,7 +11,7 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Api.Api
         {
             //http://localhost:9093/contractapi/GetAllIds
             //throw new NotImplementedException();
-            return new string[] { "A", "B", "C", "D", "E", "F" };
+            return new string[] { companyId.ToString(), "A", "B", "C", "D", "E", "F" };
         }
 
         public ContractBundle GetBundle(string key, int? companyId)
