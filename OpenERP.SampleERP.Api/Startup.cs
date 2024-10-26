@@ -15,6 +15,7 @@ using AbrPlus.Integration.OpenERP.DI;
 using SeptaKit.Repository;
 using Noyan.Repository2;
 using Noyan.Repository2.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AbrPlus.Integration.OpenERP.SampleERP.Api
 {
@@ -34,8 +35,14 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Api
             services.Configure<SampleErpOption>(x => Configuration.GetSection("App").Bind(x));
             services.Configure<ConnectionStringOption>(x => Configuration.GetSection("ConnectionStringOption").Bind(x));
 
-            services.AddDbContext<NoyanDbContext>();
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<NoyanDbContext>(options =>
+                options.UseSqlServer(connectionString));
             services.AddScoped<ITrackingRepository<Sefactor>, TrackingRepository<Sefactor>>();
+            services.AddScoped<ITrackingRepository<Vwsehesab>, TrackingRepository<Vwsehesab>>();
+            services.AddScoped<ITrackingRepository<Vwsewsgetinvoice>, TrackingRepository<Vwsewsgetinvoice>>();
+            services.AddScoped<ITrackingRepository<Vwsewsgetproforma>, TrackingRepository<Vwsewsgetproforma>>();
+            services.AddScoped<ITrackingRepository<Vwsewsgetreturninvoice>, TrackingRepository<Vwsewsgetreturninvoice>>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

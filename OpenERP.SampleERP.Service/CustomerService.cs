@@ -57,7 +57,7 @@ namespace AbrPlus.Integration.OpenERP.SampleERP.Service
         }
         public string[] GetAllIds()
         {
-            throw new NotImplementedException();
+            return new string[] { "A", "B" };
         }
         public decimal GetCustomerBalance(string customerCode)
         {
